@@ -1,0 +1,108 @@
+/* ============================================================
+   GLOBAL STYLES — Interactive Wall Calendar
+   Uses CSS custom properties for dynamic theming.
+   The accent color (--accent-*) is updated programmatically
+   when the user cycles through hero images.
+   ============================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Playfair+Display:wght@400;600;700&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ── CSS Custom Properties (Dynamic Theme) ── */
+:root {
+  --accent-h: 210;          /* hue */
+  --accent-s: 80%;          /* saturation */
+  --accent-l: 50%;          /* lightness */
+
+  --accent: hsl(var(--accent-h), var(--accent-s), var(--accent-l));
+  --accent-light: hsl(var(--accent-h), var(--accent-s), 92%);
+  --accent-dark: hsl(var(--accent-h), var(--accent-s), 30%);
+  --accent-muted: hsl(var(--accent-h), 40%, 88%);
+}
+
+/* ── Base Reset ── */
+*, *::before, *::after {
+  box-sizing: border-box;
+}
+
+html {
+  font-family: 'Inter', system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+body {
+  margin: 0;
+  padding: 0;
+  background: #0f1117;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+/* ── Utility: Accent classes driven by CSS vars ── */
+@layer utilities {
+  .bg-accent {
+    background-color: var(--accent);
+  }
+  .bg-accent-light {
+    background-color: var(--accent-light);
+  }
+  .bg-accent-muted {
+    background-color: var(--accent-muted);
+  }
+  .text-accent {
+    color: var(--accent);
+  }
+  .text-accent-dark {
+    color: var(--accent-dark);
+  }
+  .border-accent {
+    border-color: var(--accent);
+  }
+  .ring-accent {
+    --tw-ring-color: var(--accent);
+  }
+  .shadow-accent {
+    box-shadow: 0 4px 24px -4px var(--accent);
+  }
+  .bg-accent\/20 {
+    background-color: hsl(var(--accent-h), var(--accent-s), 90%);
+  }
+  .bg-accent\/10 {
+    background-color: hsl(var(--accent-h), var(--accent-s), 95%);
+  }
+}
+
+/* ── Scrollbar styling ── */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.15);
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* ── Focus rings ── */
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+/* ── Notes textarea ── */
+.notes-textarea {
+  resize: none;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+}
+.notes-textarea:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px hsl(var(--accent-h), var(--accent-s), 90%);
+  outline: none;
+}
