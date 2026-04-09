@@ -12,17 +12,21 @@ This project implements a physical-style wall calendar split-panel aesthetic. It
 
 ## Architecture
 
-This project strictly adheres to separation of concerns by divorcing logic from presentational trees via custom hooks.
+This project strictly adheres to **separation of concerns** by divorcing business logic from presentational components via custom hooks. This design pattern enables:
+
+- **Testability**: Pure logic in hooks can be unit tested independently without rendering React components.
+- **Reusability**: Hooks can be composed or migrated across components without coupling UI to logic.
+- **Maintainability**: Logic changes don't require touching component JSX, reducing regression risk.
 
 ### `hooks/useCalendar.ts`
-Manages all of the complex date math decoupled from the UI. It calculates the correct leading/trailing day padding to ensure grids map squarely to CSS. It captures the intermediate "hover preview" temporal states dynamically returning `['none', 'start', 'between', 'end', 'preview']` logic to the view.
+Manages all of the complex date math decoupled from the UI. It calculates the correct leading/trailing day padding to ensure grids map squarely to CSS. It captures the intermediate "hover preview" temporal states dynamically returning `['none', 'start', 'between', 'end', 'preview']` logic to the view. **No DOM dependencies** means this logic can be tested in isolation with pure JavaScript.
 
 ### `hooks/useNotes.ts`
-Interfaces with `localStorage`. To prevent micro-stutters commonly found in rich text inputs rapidly firing I/O events, notes are buffered in React memory immediately but debounced with a 500ms delay before flushing to disk.
+Interfaces with `localStorage` via a thin abstraction layer. To prevent micro-stutters commonly found in rich text inputs rapidly firing I/O events, notes are buffered in React memory immediately but debounced with a 300ms delay before flushing to disk. **Debouncing is a defensive programming habit** that reduces unnecessary writes and is especially valuable when discussing performance optimization in interviews.
 
 ### Component Tree
 1. **`WallCalendar`**: The structural orchestration layer controlling the grid vs hero panel distributions.
-2. **`DateCell`**: A completely pure, highly controlled component. It relies on `React.memo` to ensure date ranges only trigger surgical recalculations of cells entering or leaving `preview` state instead of globally re-rendering the calendar on every mouse hover!
+2. **`DateCell`**: A completely pure, highly controlled component wrapped in `React.memo` to ensure date ranges only trigger surgical recalculations of cells entering or leaving `preview` state instead of globally re-rendering the calendar on every mouse hover!
 3. **`HeroImage`**: Modulates aesthetics via CSS Custom Property insertions in the `<html />` root node to ensure all accents are synchronized across DOM boundaries.
 
 ## Quick Start

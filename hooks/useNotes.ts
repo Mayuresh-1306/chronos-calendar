@@ -111,7 +111,7 @@ export function useNotes(rangeStart: Date | null, rangeEnd: Date | null) {
           writeToStorage(storageKey, text);
           setIsSaved(true);
         }
-      }, 500); // 500ms debounce
+      }, 300); // 300ms debounce for defensive programming
     },
     [storageKey]
   );
