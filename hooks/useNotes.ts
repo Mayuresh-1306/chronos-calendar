@@ -14,7 +14,7 @@
 
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import { formatDateKey } from './useCalendar';
 
 // ── Constants ──────────────────────────────────────────────────
@@ -71,6 +71,8 @@ export function useNotes(rangeStart: Date | null, rangeEnd: Date | null) {
   // ── Compute the storage key for the current selection ──
   const storageKey = buildStorageKey(rangeStart, rangeEnd);
 
+  const timeoutRef = useRef<NodeJS.Timeout | null>(null);
+
   /**
    * When the selected range changes, load the corresponding note
    * from localStorage. Clear the text if no selection is active.
@@ -84,20 +86,32 @@ export function useNotes(rangeStart: Date | null, rangeEnd: Date | null) {
     const saved = readFromStorage(storageKey);
     setNoteText(saved);
     setIsSaved(saved !== '');
+    
+    // Clear any pending saves on key change
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
+    }
   }, [storageKey]);
 
   /**
    * Called from the textarea's onChange handler.
-   * Updates local state AND persists immediately to localStorage.
+   * Updates local state INSTANTLY but DEBOUNCES the localStorage write.
    */
   const handleNoteChange = useCallback(
     (text: string) => {
       setNoteText(text);
       setIsSaved(false);
-      if (storageKey) {
-        writeToStorage(storageKey, text);
-        setIsSaved(true);
+      
+      if (timeoutRef.current) {
+        clearTimeout(timeoutRef.current);
       }
+
+      timeoutRef.current = setTimeout(() => {
+        if (storageKey) {
+          writeToStorage(storageKey, text);
+          setIsSaved(true);
+        }
+      }, 500); // 500ms debounce
     },
     [storageKey]
   );
@@ -110,6 +124,9 @@ export function useNotes(rangeStart: Date | null, rangeEnd: Date | null) {
     setIsSaved(false);
     if (storageKey) {
       removeFromStorage(storageKey);
+    }
+    if (timeoutRef.current) {
+      clearTimeout(timeoutRef.current);
     }
   }, [storageKey]);
 

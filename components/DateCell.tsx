@@ -23,7 +23,7 @@
 
 'use client';
 
-import React, { useCallback, KeyboardEvent } from 'react';
+import React, { useCallback, KeyboardEvent, memo } from 'react';
 import { motion } from 'framer-motion';
 import type { CalendarDay } from '@/hooks/useCalendar';
 
@@ -64,7 +64,7 @@ const stateStyles: Record<DayState, string> = {
   `,
 };
 
-export default function DateCell({ day, state, onClick, onHover }: DateCellProps) {
+function DateCell({ day, state, onClick, onHover }: DateCellProps) {
   // Padding/empty cell — render a blank space
   if (!day.date || day.dayNumber === null) {
     return <div className="h-9" aria-hidden="true" />;
@@ -134,3 +134,5 @@ export default function DateCell({ day, state, onClick, onHover }: DateCellProps
     </motion.button>
   );
 }
+
+export default memo(DateCell);
